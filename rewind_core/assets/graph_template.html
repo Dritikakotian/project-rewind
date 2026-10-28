@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rewind - Context graph</title>
+<style>
+:root{
+  --bg:var(--vscode-editor-background,#101318);--fg:var(--vscode-foreground,#d7dce3);--mut:var(--vscode-descriptionForeground,#8a93a0);
+  --line:var(--vscode-panel-border,#262b33);--card:var(--vscode-sideBar-background,#161a21);--hover:var(--vscode-list-hoverBackground,#1d222b);
+  --accent:var(--vscode-button-background,#4c9aff);--accent-fg:var(--vscode-button-foreground,#fff);
+  --font:var(--vscode-font-family,-apple-system,"Segoe UI",Roboto,sans-serif);
+}
+@media (prefers-color-scheme:light){:root{--bg:var(--vscode-editor-background,#fff);--fg:var(--vscode-foreground,#1f2328);--mut:var(--vscode-descriptionForeground,#656d76);--line:var(--vscode-panel-border,#d8dee4);--card:var(--vscode-sideBar-background,#f6f8fa);--hover:var(--vscode-list-hoverBackground,#eaeef2)}}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:13px/1.45 var(--font);background:var(--bg);color:var(--fg);display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}.title small{font-weight:400;color:var(--mut)}
+.search{flex:1 1 160px;max-width:260px;background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:6px 10px;outline:none;font:inherit}
+.search:focus{border-color:var(--accent)}
+.time{display:flex;align-items:center;gap:10px;flex:1 1 260px;min-width:220px}
+.time input{flex:1;accent-color:var(--accent)}.time span{color:var(--mut);white-space:nowrap;font-size:12px;min-width:150px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+button:hover{background:var(--hover)}button.primary{background:var(--accent);color:var(--accent-fg);border-color:transparent;font-weight:500}
+button.primary:hover{filter:brightness(1.1)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:12px;user-select:none}
+.chip i{width:8px;height:8px;border-radius:50%}.chip.off{opacity:.4}.chip b{font-weight:500;color:var(--mut)}
+main{flex:1;display:flex;min-height:0}
+#stage{flex:1;position:relative;min-width:0}svg{width:100%;height:100%;display:block;cursor:grab;touch-action:none}svg.pan{cursor:grabbing}
+.edge{stroke:var(--mut);stroke-opacity:.35;stroke-width:1}.edge.spine{stroke-dasharray:3 4;stroke-opacity:.5;stroke-width:1.5}.edge.imp{stroke-opacity:.22}
+.node{cursor:pointer}.node circle{stroke:var(--bg);stroke-width:2}.node text.lbl{font-size:12px;fill:var(--fg);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.node text.num{font-size:11px;font-weight:700;fill:#fff;text-anchor:middle;pointer-events:none}
+.node.sel circle{stroke:var(--fg);stroke-width:2.5}.match circle{stroke:#ffd45e;stroke-width:3}
+#tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);padding:6px 9px;border-radius:6px;max-width:320px;font-size:12px;box-shadow:0 4px 14px #0006;display:none;z-index:5}
+.ctl{position:absolute;right:12px;bottom:12px;display:flex;gap:6px}.ctl button{padding:4px 10px}
+.empty{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:var(--mut);text-align:center;padding:30px}
+aside{width:340px;border-left:1px solid var(--line);background:var(--card);overflow:auto;padding:16px;flex:none}
+aside h3{margin:10px 0 6px;font-size:15px;line-height:1.3;word-break:break-word}aside h4{margin:18px 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;color:#fff}.muted{color:var(--mut)}
+dl{margin:8px 0;display:grid;grid-template-columns:84px 1fr;gap:4px 10px}dt{color:var(--mut)}dd{margin:0;word-break:break-word}
+.rel{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer}.rel:hover{background:var(--hover)}.rel i{width:8px;height:8px;border-radius:50%;flex:none}
+.rel span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+pre{white-space:pre-wrap;font:11.5px/1.5 var(--vscode-editor-font-family,ui-monospace,Consolas,monospace);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;max-height:260px;overflow:auto;margin:6px 0 10px}
+.row{display:flex;gap:8px;margin-top:10px}.hint{color:var(--mut);margin-top:8px}.step em{font-style:normal;color:var(--mut);font-size:11px;margin-right:4px}.step span{white-space:normal}#dBack{margin-bottom:10px;padding:3px 10px}
+@media (max-width:860px){main{flex-direction:column}aside{width:100%;height:42%;border-left:0;border-top:1px solid var(--line)}}
+</style></head><body>
+<header>
+  <div class="title">Context graph <small id="proj"></small></div>
+  <input id="q" class="search" type="search" placeholder="Search memories and files">
+  <div class="time"><input id="slider" type="range" min="0" value="0"><span id="tlabel"></span></div>
+  <button class="primary" id="copyTop">Copy AI handoff</button>
+</header>
+<div class="chips" id="chips"></div>
+<main>
+  <div id="stage"><svg id="svg"><g id="vp"><g id="edges"></g><g id="nodes"></g></g></svg>
+    <div id="tip"></div><div class="empty" id="empty">Nothing recorded yet.<br>Work for a bit and Rewind will build your graph.</div>
+    <div class="ctl"><button id="fit" title="Fit to screen">Fit</button><button id="zin">+</button><button id="zout">-</button></div></div>
+  <aside id="side"></aside>
+</main>
+<script>
+const D=__DATA__;
+const vs=typeof acquireVsCodeApi==="function"?acquireVsCodeApi():null;
+const T={task:{c:"#8b7cf6",n:"Tasks",r:9},checkpoint:{c:"#4c9aff",n:"Milestones",r:14},decision:{c:"#34c38f",n:"Decisions",r:9},failed:{c:"#f06464",n:"Dead ends",r:9},error:{c:"#f0a04b",n:"Errors",r:9},pause:{c:"#b48cf2",n:"Pauses",r:8},commit:{c:"#8b949e",n:"Commits",r:7},file:{c:"#64748b",n:"Files",r:4}};
+const $=id=>document.getElementById(id),NS="http://www.w3.org/2000/svg";
+const byId={};D.nodes.forEach(n=>byId[n.id]=n);
+const cps=D.nodes.filter(n=>n.type==="checkpoint").sort((a,b)=>a.cp-b.cp);
+const edges=D.edges.map(e=>({...e}));
+for(let i=1;i<cps.length;i++)edges.push({s:cps[i-1].id,d:cps[i].id,rel:"then",spine:true});
+(function(){
+  const linked=new Set();D.edges.forEach(e=>{const a=byId[e.s],b=byId[e.d];if(a&&b){if(a.type==="checkpoint")linked.add(e.d);if(b.type==="checkpoint")linked.add(e.s)}});
+  D.nodes.forEach(n=>{if(n.type==="checkpoint"||n.type==="file"||linked.has(n.id)||!cps.length)return;
+    let c=cps[0];cps.forEach(x=>{if(x.ts<=n.ts)c=x});edges.push({s:n.id,d:c.id,rel:"during",implicit:true})});})();
+const adj={};D.nodes.forEach(n=>adj[n.id]=[]);edges.forEach(e=>{if(adj[e.s]&&adj[e.d]){adj[e.s].push(e.d);adj[e.d].push(e.s)}});
+const hidden={file:true};let idx=Math.max(0,cps.length-1),sel=null,hover=null,query="",vis=new Set(),P={},W=800,H=600,alpha=0,raf=0;
+let view={x:0,y:0,k:1};
+const rel=ts=>{const s=(Date.now()-Date.parse(ts))/1000;if(isNaN(s))return"";if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago"};
+const esc=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cut=()=>cps.length?cps[idx].ts:"9999";
+
+$("proj").textContent=D.project;
+$("slider").max=Math.max(0,cps.length-1);$("slider").value=idx;$("slider").disabled=cps.length<2;
+function copyText(t,btn){if(vs)vs.postMessage({copy:t});else if(navigator.clipboard)navigator.clipboard.writeText(t);
+  if(btn){const o=btn.textContent;btn.textContent="Copied";setTimeout(()=>btn.textContent=o,1400)}}
+const handoffAt=()=>cps.length?(D.handoffs[cps[idx].cp]||D.latest):D.latest;
+$("copyTop").onclick=e=>copyText(idx===cps.length-1?D.latest:handoffAt(),e.target);
+
+/* ---------- visibility ---------- */
+function computeVis(){
+  const c=cut(),v=new Set();
+  D.nodes.forEach(n=>{if(n.type!=="file"&&!hidden[n.type]&&n.ts<=c)v.add(n.id)});
+  if(!hidden.file)D.nodes.forEach(n=>{if(n.type==="file"&&adj[n.id].some(o=>v.has(o)))v.add(n.id)});
+  return v;}
+function chips(){
+  const counts={};D.nodes.forEach(n=>counts[n.type]=(counts[n.type]||0)+1);
+  $("chips").innerHTML=Object.keys(T).filter(k=>counts[k]).map(k=>`<span class="chip ${hidden[k]?"off":""}" data-t="${k}"><i style="background:${T[k].c}"></i>${T[k].n} <b>${counts[k]}</b></span>`).join("");
+  document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{hidden[c.dataset.t]=!hidden[c.dataset.t];rebuild(true)});}
+function tlabel(){
+  if(!cps.length){$("tlabel").textContent="No milestones yet";return}
+  const c=cps[idx];$("tlabel").textContent=idx===cps.length-1?`Now - milestone #${c.cp}`:`Time machine: milestone #${c.cp}, ${rel(c.ts)}`;}
+
+/* ---------- layout (small force simulation) ---------- */
+function size(){const r=$("stage").getBoundingClientRect();W=Math.max(300,r.width);H=Math.max(300,r.height);}
+function target(n){
+  const rank=cps.findIndex(c=>c.id===n.id),span=Math.max(520,cps.length*52);
+  if(n.type==="checkpoint")return{x:W*.32,y:70+(rank/Math.max(1,cps.length-1))*span,sx:.04,sy:.08};
+  const near=adj[n.id].map(o=>byId[o]).filter(o=>o&&o.type==="checkpoint")[0];
+  const y=near?70+(cps.indexOf(near)/Math.max(1,cps.length-1))*span:null;
+  const col={task:W*.08,file:W*.88}[n.type]||W*.62;
+  return{x:col,y:y,sx:.012,sy:y===null?0:.01};}
+function spawn(id){
+  if(P[id])return;const n=byId[id],t=target(n);
+  const nb=adj[id].map(o=>P[o]).filter(Boolean)[0];
+  P[id]={id,x:(nb?nb.x:t.x)+(Math.random()-.5)*60,y:(nb?nb.y:(t.y===null?H/2:t.y))+(Math.random()-.5)*60,vx:0,vy:0,r:T[n.type].r+Math.min(6,adj[id].length*.4)};}
+function step(a){
+  const ids=[...vis],N=ids.length;
+  for(let i=0;i<N;i++){const p=P[ids[i]];
+    for(let j=i+1;j<N;j++){const q=P[ids[j]];let dx=q.x-p.x,dy=q.y-p.y,d2=dx*dx+dy*dy;
+      if(d2<1){dx=Math.random()-.5;dy=Math.random()-.5;d2=1}const d=Math.sqrt(d2),f=(2600/d2)*a,min=p.r+q.r+10;
+      let fx=dx/d*f,fy=dy/d*f;if(d<min){const o=(min-d)*.05;fx+=dx/d*o;fy+=dy/d*o}
+      p.vx-=fx;p.vy-=fy;q.vx+=fx;q.vy+=fy;}}
+  edges.forEach(e=>{if(!vis.has(e.s)||!vis.has(e.d))return;const p=P[e.s],q=P[e.d];
+    const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy)||1,rest=e.spine?60:e.implicit?120:85,f=(d-rest)*(e.spine?.07:.04)*a;
+    p.vx+=dx/d*f;p.vy+=dy/d*f;q.vx-=dx/d*f;q.vy-=dy/d*f;});
+  ids.forEach(id=>{const p=P[id];if(p.fixed)return;const t=target(byId[id]);
+    p.vx+=(t.x-p.x)*t.sx*a;if(t.y!==null)p.vy+=(t.y-p.y)*t.sy*a;
+    p.vx*=.82;p.vy*=.82;p.x+=p.vx;p.y+=p.vy;});}
+function settle(n){for(let i=0;i<n;i++)step(Math.max(.05,1-i/n));}
+function loop(){cancelAnimationFrame(raf);const f=()=>{step(alpha);draw();alpha*=.97;if(alpha>.02)raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f);}
+function warm(a){alpha=Math.max(alpha,a);loop();}
+
+/* ---------- reasoning: walk a decision back to its cause ---------- */
+const CAUSAL=["because","attempt-for"];
+function chain(id,dir,maxDepth){
+  const res=[],seen=new Set([id]);
+  (function walk(n,d){
+    if(d>maxDepth)return;
+    D.edges.forEach(e=>{
+      let next=null,via="";
+      if(dir==="why"){
+        if(e.s===n&&e.rel==="because"){next=e.d;via="because of"}
+        else if(e.s===n&&e.rel==="attempt-for"){next=e.d;via="was an attempt to fix"}
+        else if(e.d===n&&e.rel==="resolved-by"){next=e.s;via="fixes"}
+        else if(e.d===n&&e.rel==="decided"){next=e.s;via="decided during task"}
+      }else{
+        if(e.d===n&&e.rel==="because"){next=e.s;via="led to decision"}
+        else if(e.d===n&&e.rel==="attempt-for"){next=e.s;via="tried to fix it:"}
+        else if(e.s===n&&e.rel==="resolved-by"){next=e.d;via="fixed by"}
+        else if(e.s===n&&e.rel==="decided"){next=e.d;via="led to decision"}
+      }
+      if(next!=null&&!seen.has(next)&&byId[next]&&byId[next].type!=="file"){seen.add(next);res.push({id:next,via,depth:d,e});walk(next,d+1)}
+    });
+  })(id,1);
+  return res;}
+function reasoningPath(id){
+  const nodes=new Set([id]),edgeKeys=new Set();
+  ["why","then"].forEach(dir=>chain(id,dir,5).forEach(s=>{nodes.add(s.id);edgeKeys.add(s.e.s+">"+s.e.d)}));
+  return{nodes,edges:edgeKeys};}
+function chainHtml(id){
+  const part=(title,items,empty)=>`<h4>${title}</h4>`+(items.length?items.map(s=>`<div class="rel step" data-id="${s.id}" style="padding-left:${8+(s.depth-1)*16}px"><i style="background:${T[byId[s.id].type].c}"></i><span><em>${s.via}</em> ${esc(byId[s.id].label)}</span></div>`).join(""):`<p class="muted">${empty}</p>`);
+  return part("Why this exists",chain(id,"why",5),"No recorded cause: it was created directly.")+part("What came of it",chain(id,"then",5),"Nothing has followed from it yet.");}
+
+/* ---------- rendering ---------- */
+const gE=$("edges"),gN=$("nodes"),els={},eels=[];
+function mk(tag,cls){const e=document.createElementNS(NS,tag);if(cls)e.setAttribute("class",cls);return e}
+function rebuild(relayout){
+  size();vis=computeVis();chips();tlabel();
+  gE.textContent="";gN.textContent="";eels.length=0;for(const k in els)delete els[k];
+  $("empty").style.display=D.nodes.length?"none":"flex";
+  vis.forEach(spawn);
+  edges.forEach(e=>{if(!vis.has(e.s)||!vis.has(e.d))return;const l=mk("line","edge"+(e.spine?" spine":"")+(e.implicit?" imp":""));gE.appendChild(l);eels.push({e,l})});
+  vis.forEach(id=>{const n=byId[id],p=P[id],g=mk("g","node");g.dataset.id=id;
+    const c=mk("circle");c.setAttribute("r",p.r);c.setAttribute("fill",T[n.type].c);g.appendChild(c);
+    if(n.type==="checkpoint"){const t=mk("text","num");t.textContent=n.cp;t.setAttribute("y",4);g.appendChild(t)}
+    const l=mk("text","lbl");l.textContent=n.label.length>34?n.label.slice(0,33)+"...":n.label;l.setAttribute("x",p.r+6);l.setAttribute("y",4);g.appendChild(l);
+    gN.appendChild(g);els[id]={g,l,c}});
+  settle(relayout?260:20);draw();if(relayout)fit();}
+function neighbors(id){return new Set([id,...adj[id]])}
+function draw(){
+  const focus=hover!=null?hover:sel,nb=focus!=null?neighbors(focus):null,q=query.trim().toLowerCase();
+  const path=sel!=null&&byId[sel]?reasoningPath(sel):null;
+  const match=q?new Set(D.nodes.filter(n=>vis.has(n.id)&&(n.label+" "+(n.info||"")).toLowerCase().includes(q)).map(n=>n.id)):null;
+  $("vp").setAttribute("transform",`translate(${view.x},${view.y}) scale(${view.k})`);
+  eels.forEach(({e,l})=>{const p=P[e.s],q2=P[e.d];l.setAttribute("x1",p.x);l.setAttribute("y1",p.y);l.setAttribute("x2",q2.x);l.setAttribute("y2",q2.y);
+    const inPath=!!(path&&path.edges.has(e.s+">"+e.d)),on=nb?(e.s===focus||e.d===focus||inPath):true;
+    l.style.opacity=match?.15:(on?1:.07);
+    if(inPath){l.style.stroke="#f0a04b";l.style.strokeWidth=2.6;l.style.strokeOpacity=1}
+    else{l.style.stroke="";l.style.strokeWidth="";l.style.strokeOpacity=(nb&&on)?.8:""}});
+  vis.forEach(id=>{const o=els[id];if(!o)return;const p=P[id],n=byId[id];
+    o.g.setAttribute("transform",`translate(${p.x},${p.y})`);
+    const dim=nb?!(nb.has(id)||(path&&path.nodes.has(id))):(match?!match.has(id):false);o.g.style.opacity=dim?.3:1;
+    o.g.classList.toggle("sel",id===sel);o.g.classList.toggle("match",!!(match&&match.has(id)));
+    const show=id===sel||id===hover||(((nb&&nb.has(id))||(path&&path.nodes.has(id)))&&view.k>.5)||(match&&match.has(id))||(!nb&&view.k>.55&&n.type!=="file"&&n.type!=="commit"&&n.type!=="checkpoint");
+    o.l.style.display=show?"":"none";});}
+function fit(){
+  size();const ids=[...vis];if(!ids.length)return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;ids.forEach(i=>{const p=P[i];x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)});
+  const bw=x1-x0+220,bh=y1-y0+90,k=Math.min(W/bw,H/bh,1.7);
+  view={k,x:W/2-((x0+x1)/2)*k-60*k,y:H/2-((y0+y1)/2)*k};draw();}
+
+/* ---------- details drawer ---------- */
+function nearestCp(n){if(n.type==="checkpoint")return n;let b=null;cps.forEach(c=>{if(c.ts<=n.ts)b=c});return b||cps[0]||null}
+function drawer(){
+  const s=$("side");
+  if(sel==null){
+    const counts={};[...vis].forEach(i=>counts[byId[i].type]=(counts[byId[i].type]||0)+1);
+    s.innerHTML=`<h3>What Rewind remembers</h3><p class="muted">Click any node to walk its reasoning: why it exists, what came of it, and the handoff for that moment. Drag the time slider to see the project as it was earlier.</p>
+      <h4>Legend</h4>`+Object.keys(T).filter(k=>counts[k]).map(k=>`<div class="rel" style="cursor:default"><i style="background:${T[k].c}"></i><span>${T[k].n}</span><span class="muted" style="margin-left:auto">${counts[k]}</span></div>`).join("")+
+      `<div class="row"><button class="primary" id="dCopy">Copy latest handoff</button></div><p class="hint">Dashed line = timeline. Drag nodes to rearrange, scroll to zoom.</p>`;
+    $("dCopy").onclick=e=>copyText(D.latest,e.target);return;}
+  const n=byId[sel],cp=nearestCp(n),h=cp?(D.handoffs[cp.cp]||D.latest):D.latest;
+  const info=(n.info||"").split("\n").filter(Boolean).map(l=>{const i=l.indexOf(": ");return[l.slice(0,i),l.slice(i+2)]});
+  const label={why:"Why",status:"Status",solution:"Solution",count:"Seen",hypothesis:"Hypothesis",testing:"Testing",result:"Result",next:"Next",author:"Author",confidence:"Confidence",evidence:"Evidence"};
+  s.innerHTML=`${hist.length>1?'<button id="dBack">&larr; Back</button><br>':""}<span class="pill" style="background:${T[n.type].c}">${T[n.type].n.replace(/s$/,"")}</span> <span class="muted">${rel(n.ts)}</span>
+    <h3>${esc(n.label)}</h3>${info.length?"<dl>"+info.map(([k,v])=>`<dt>${esc(label[k]||k)}</dt><dd>${esc(v)}</dd>`).join("")+"</dl>":""}
+    ${chainHtml(n.id)}<h4>Connected</h4>${adj[n.id].filter(o=>byId[o]&&vis.has(o)).map(o=>`<div class="rel" data-id="${o}"><i style="background:${T[byId[o].type].c}"></i><span>${esc(byId[o].label)}</span></div>`).join("")||'<p class="muted">No visible connections.</p>'}
+    <h4>Continue from here</h4><p class="muted">Paste this into any AI chat to resume from ${cp?"milestone #"+cp.cp:"the latest state"}.</p>
+    <div class="row"><button class="primary" id="dCopy">Copy handoff</button><button id="dTime">Show project at this time</button></div><pre>${esc(h)}</pre>`;
+  s.querySelectorAll(".rel[data-id]").forEach(r=>r.onclick=()=>select(+r.dataset.id));
+  if($("dBack"))$("dBack").onclick=()=>{hist.pop();sel=hist[hist.length-1];drawer();draw()};
+  $("dCopy").onclick=e=>copyText(h,e.target);
+  $("dTime").onclick=()=>{if(cp){idx=cps.indexOf(cp);$("slider").value=idx;rebuild(false)}};}
+const hist=[];
+function select(id){sel=id;if(hist[hist.length-1]!==id)hist.push(id);drawer();draw();}
+
+/* ---------- interaction ---------- */
+const svg=$("svg"),tip=$("tip");let drag=null;
+const toWorld=(cx,cy)=>{const r=svg.getBoundingClientRect();return{x:(cx-r.left-view.x)/view.k,y:(cy-r.top-view.y)/view.k}};
+svg.addEventListener("pointerdown",e=>{const g=e.target.closest(".node");svg.setPointerCapture(e.pointerId);
+  drag={id:g?+g.dataset.id:null,sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y,moved:false};if(!g)svg.classList.add("pan");else P[drag.id].fixed=true;});
+svg.addEventListener("pointermove",e=>{
+  if(drag){const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;
+    if(drag.id!=null){const w=toWorld(e.clientX,e.clientY);P[drag.id].x=w.x;P[drag.id].y=w.y;warm(.3)}else{view.x=drag.vx+dx;view.y=drag.vy+dy;draw()}return}
+  const g=e.target.closest(".node"),id=g?+g.dataset.id:null;
+  if(id!==hover){hover=id;draw()}
+  if(id!=null){const n=byId[id],r=$("stage").getBoundingClientRect();tip.style.display="block";tip.style.left=Math.min(e.clientX-r.left+14,r.width-330)+"px";tip.style.top=(e.clientY-r.top+14)+"px";
+    tip.innerHTML=`<b style="color:${T[n.type].c}">${T[n.type].n.replace(/s$/,"")}</b> - ${esc(n.label)}`}else tip.style.display="none";});
+svg.addEventListener("pointerup",e=>{if(!drag)return;svg.classList.remove("pan");
+  if(drag.id!=null){P[drag.id].fixed=false;if(!drag.moved)select(drag.id)}else if(!drag.moved){sel=null;hist.length=0;drawer();draw()}drag=null;});
+svg.addEventListener("pointerleave",()=>{tip.style.display="none";if(hover!=null){hover=null;draw()}});
+svg.addEventListener("wheel",e=>{e.preventDefault();const r=svg.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const k=Math.min(3,Math.max(.2,view.k*Math.exp(-e.deltaY*.0015)));view.x=mx-(mx-view.x)*(k/view.k);view.y=my-(my-view.y)*(k/view.k);view.k=k;draw()},{passive:false});
+function zoom(f){const k=Math.min(3,Math.max(.2,view.k*f)),mx=W/2,my=H/2;view.x=mx-(mx-view.x)*(k/view.k);view.y=my-(my-view.y)*(k/view.k);view.k=k;draw()}
+$("zin").onclick=()=>zoom(1.25);$("zout").onclick=()=>zoom(.8);$("fit").onclick=fit;
+$("slider").oninput=e=>{idx=+e.target.value;if(sel!=null&&byId[sel].ts>cut())sel=null;rebuild(false);drawer()};
+$("q").oninput=e=>{query=e.target.value;draw()};
+$("q").onkeydown=e=>{if(e.key==="Enter"&&query.trim()){const q=query.toLowerCase(),m=D.nodes.find(n=>vis.has(n.id)&&n.label.toLowerCase().includes(q));if(m)select(m.id)}};
+addEventListener("resize",()=>{size();draw()});
+
+rebuild(true);drawer();
+const h=location.hash.match(/select=(\d+)/);if(h&&byId[+h[1]])select(+h[1]);
+</script></body></html>

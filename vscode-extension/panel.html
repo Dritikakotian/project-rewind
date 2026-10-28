@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-__NONCE__';">
+<style>
+:root{--card:var(--vscode-editorWidget-background,var(--vscode-editor-background));--line:var(--vscode-widget-border,var(--vscode-panel-border,#3333));--mut:var(--vscode-descriptionForeground);
+  --accent:var(--vscode-button-background);--accent-fg:var(--vscode-button-foreground);--red:#f06464;--amber:#e0a040;--green:#3fb97f;--blue:#4c9aff;--violet:#a58bf0}
+*{box-sizing:border-box}body{margin:0;padding:12px 12px 24px;color:var(--vscode-foreground);font:12.5px/1.45 var(--vscode-font-family)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}.name{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:11.5px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px #3fb97f33}
+.actions{display:flex;gap:6px;margin:12px 0 0}.actions.sec{margin:6px 0 12px}.actions.sec button{flex:1}
+button{font:inherit;cursor:pointer;border-radius:6px;padding:6px 10px;border:1px solid var(--line);background:transparent;color:var(--vscode-foreground)}
+button:hover{background:var(--vscode-toolbar-hoverBackground,#8883)}button.primary{background:var(--accent);color:var(--accent-fg);border-color:transparent;font-weight:500;flex:1}
+button.primary:hover{background:var(--vscode-button-hoverBackground)}button.ghost{border-color:transparent;color:var(--mut);padding:4px 8px}button.ghost:hover{color:var(--vscode-foreground)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin:10px 0}
+.eyebrow{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.title{font-size:14px;font-weight:600;line-height:1.35;word-break:break-word}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut);font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:0;text-transform:none}
+.b-blocked{background:#f0646426;color:var(--red)}.b-progress{background:#4c9aff26;color:var(--blue)}.b-saved{background:#3fb97f26;color:var(--green)}.b-auto{background:#4c9aff26;color:var(--blue)}
+.mission.blocked{border-color:#f0646455}.next{margin-top:10px;padding:8px 10px;border-left:3px solid var(--accent);background:#8881;border-radius:0 6px 6px 0}
+.next b{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:500;margin-bottom:2px}
+.bar{height:5px;border-radius:3px;background:var(--line);margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green);border-radius:3px}
+.kv{display:grid;grid-template-columns:70px 1fr;gap:8px 10px}.kv dt{color:var(--mut)}.kv dd{margin:0;word-break:break-word}.bad{color:var(--red)}.ok{color:var(--green)}
+.warn{margin-top:10px;padding:6px 8px;border-radius:6px;background:#e0a04022;color:var(--amber);font-size:11.5px}
+.alert{border-color:#f0646466;background:#f064641a}.alert .eyebrow{color:var(--red)}.item{padding:6px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0}
+.sub{color:var(--mut);font-size:11.5px;margin-top:2px;word-break:break-word}code{font-family:var(--vscode-editor-font-family);font-size:11px;background:#8883;padding:0 5px;border-radius:4px}
+details{margin:2px 0;border-top:1px solid var(--line)}summary{cursor:pointer;padding:9px 2px;list-style:none;display:flex;align-items:center;justify-content:space-between;font-weight:500}
+summary::-webkit-details-marker{display:none}summary .n{color:var(--mut);font-weight:400}summary:before{content:"\25B8";color:var(--mut);margin-right:6px;font-size:10px;transition:transform .1s}
+details[open]>summary:before{transform:rotate(90deg)}summary span.l{flex:1}
+details.ev{border:0;margin:6px 0 0}details.ev>summary{padding:0;font-weight:400;font-size:11px;color:var(--mut);justify-content:flex-start;gap:6px}
+details.ev>summary:before{margin-right:2px}.meter{display:inline-block;width:34px;height:4px;border-radius:2px;background:var(--line);overflow:hidden;vertical-align:middle}.meter i{display:block;height:100%}
+.ev ul{margin:6px 0 4px;padding-left:16px;color:var(--mut);font-size:11.5px}.ev .evb{display:flex;gap:6px;margin:6px 0 2px}.ev .evb button{padding:2px 8px;font-size:11px}
+.hi{color:var(--green)}.md{color:var(--amber)}.lo{color:var(--mut)}.hi i{background:var(--green)}.md i{background:var(--amber)}.lo i{background:var(--mut)}
+.row{display:flex;gap:8px;align-items:flex-start;padding:5px 2px}.row .d{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}.row .t{flex:1;min-width:0;word-break:break-word}
+.row .when{color:var(--mut);font-size:11px;white-space:nowrap}.row button.cp{opacity:0;padding:1px 6px;font-size:11px}.row:hover button.cp{opacity:1}
+.day{margin:12px 2px 2px;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}.day:first-child{margin-top:2px}
+.chk{width:13px;height:13px;border:1.5px solid var(--mut);border-radius:4px;margin-top:3px;flex:none}.chk.on{background:var(--green);border-color:var(--green)}.done{color:var(--mut);text-decoration:line-through}
+.empty{text-align:center;color:var(--mut);padding:26px 10px}.empty b{color:var(--vscode-foreground);display:block;font-size:13px;margin-bottom:6px}
+.foot{margin-top:14px;color:var(--mut);font-size:11px;text-align:center}.add{display:flex;gap:6px;flex-wrap:wrap;padding:2px 0 10px}
+</style></head><body>
+<div id="app"><div class="empty">Loading...</div></div>
+<script nonce="__NONCE__">
+const vs=acquireVsCodeApi();const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rel=ts=>{const s=(Date.now()-Date.parse(ts))/1000;if(isNaN(s))return"";if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago"};
+const day=ts=>{const d=new Date(Date.parse(ts)),t=new Date(),y=new Date(Date.now()-864e5);const same=(a,b)=>a.toDateString()===b.toDateString();
+  return same(d,t)?"Today":same(d,y)?"Yesterday":d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})};
+const KIND={start:"#4c9aff",commit:"#8b949e",bug:"#e0a040",attempt:"#f06464",fix:"#3fb97f","task-done":"#3fb97f",pause:"#a58bf0",manual:"#4c9aff"};
+const send=(cmd,arg)=>vs.postMessage({cmd,arg});
+const sec=(id,title,n,body)=>n?`<details data-k="${id}" ${open[id]?"open":""}><summary><span class="l">${title}</span><span class="n">${n}</span></summary>${body}</details>`:"";
+let open={};try{open=(vs.getState()||{}).open||{}}catch(e){}
+
+/* provenance: how sure Rewind is about an inferred item, why, and a way to correct it */
+function trust(x,withActions){
+  if(!x||!x.auto)return"";
+  if(x.confirmed)return `<div class="sub hi">Confirmed by you</div>`;
+  const c=typeof x.confidence==="number"?x.confidence:null;
+  const lvl=c==null?"lo":c>=.8?"hi":c>=.6?"md":"lo",word=c==null?"Inferred":(c>=.8?"High":c>=.6?"Medium":"Low")+" confidence";
+  const ev=(x.evidence||[]).map(e=>`<li>${esc(e)}</li>`).join("");
+  return `<details class="ev"><summary class="${lvl}">Inferred - ${word}${c!=null?`<span class="meter ${lvl}"><i style="width:${Math.round(c*100)}%"></i></span>`:""}</summary>
+    ${ev?`<ul>${ev}</ul>`:""}${withActions&&x.id!=null?`<div class="evb"><button data-c="rewind.confirm" data-a="${x.id}">Correct</button><button class="ghost" data-c="rewind.dismiss" data-a="${x.id}">Wrong, hide it</button></div>`:""}</details>`;
+}
+function render(s){
+  if(!s){$("#app").innerHTML='<div class="empty">Open a folder to use Rewind.</div>';return}
+  const m=s.mission,tasks=s.tasks||[],st=s.stopped;
+  const active=m||st||(s.milestones||[]).length>1||(s.decisions||[]).length||(s.deadends||[]).length;
+  let h=`<div class="top"><div class="name" title="${esc(s.project)}">${esc(s.project)}</div><div class="live"><span class="dot"></span>${s.last_active?"Active "+rel(s.last_active):"Watching"}</div></div>
+  <div class="actions"><button class="primary" data-c="rewind.handoff">Copy for AI</button></div>
+  <div class="actions sec"><button data-c="rewind.pause">Pause</button><button data-c="rewind.resume">Resume</button><button data-c="rewind.graph">Graph</button></div>`;
+  if(!active){h+=`<div class="empty"><b>Rewind is watching</b>Edit a file, run a command or make a commit. Your mission, decisions and dead ends appear here automatically.</div>`}
+  if(s.away){const a=s.away;h+=`<div class="card"><div class="eyebrow">While you were away<button class="ghost" data-c="rewind.dismissAway">Dismiss</button></div>
+    ${(a.commits||[]).slice(0,4).map(c=>`<div class="item"><div>${esc(c[2])}</div><div class="sub">${esc(c[0])} by ${c[3]?"you":esc(c[1])}</div></div>`).join("")}
+    <div class="chips">${a.files?`<span class="chip">${a.files} files changed</span>`:""}${(a.deps||[]).map(d=>`<span class="chip">deps: ${esc(d)}</span>`).join("")}${(a.merges||[]).length?`<span class="chip">${a.merges.length} merged</span>`:""}</div></div>`}
+  if(m){const pct=m.total?Math.round(m.done/m.total*100):0,blocked=m.status==="blocked";
+    h+=`<div class="card mission ${blocked?"blocked":""}"><div class="eyebrow">Current mission<span class="badge ${blocked?"b-blocked":"b-progress"}">${esc(m.status_text)}</span></div>
+    <div class="title">${esc(m.title)}</div>
+    ${m.next?`<div class="next"><b>Next</b>${esc(m.next)}</div>`:""}
+    <div class="chips">${s.branch?`<span class="chip">${esc(s.branch)}</span>`:""}${(s.files||[]).length?`<span class="chip">${s.files.length} active file${s.files.length>1?"s":""}</span>`:""}</div>
+    ${m.total>1?`<div class="bar"><i style="width:${pct}%"></i></div><div class="sub">${m.done} of ${m.total} tasks done</div>`:""}${trust(m,true)}</div>`}
+  if((s.errors||[]).length){h+=`<div class="card alert"><div class="eyebrow">Open errors<button class="ghost" data-c="rewind.showTried">What was tried</button></div>`+
+    s.errors.map(e=>`<div class="item"><div>${esc(e.label.slice(0,110))}</div><div class="sub">seen ${e.count}x${e.cmd?` - <code>${esc(e.cmd.slice(0,60))}</code>`:""}</div></div>`).join("")+`</div>`}
+  if(st){const res=st.result||"",cls=/^failed/.test(res)?"bad":/^passed/.test(res)?"ok":"";
+    h+=`<div class="card"><div class="eyebrow">Where you stopped<span class="badge ${st.source==="auto"?"b-auto":"b-saved"}">${st.source==="auto"?"inferred":"saved "+rel(st.ts)}</span></div>
+    <dl class="kv" style="margin:0"><dt>Hypothesis</dt><dd>${esc(st.hypothesis||"-")}</dd><dt>Testing</dt><dd>${esc((st.testing||"-").slice(0,120))}</dd><dt>Result</dt><dd class="${cls}">${esc(res||"-")}</dd><dt>Next</dt><dd>${esc(st.next||"-")}</dd></dl>
+    ${(st.stale||[]).length?`<div class="warn">May be outdated: ${st.stale.length} related file${st.stale.length>1?"s":""} changed since this was saved.</div>`:""}${trust(st,false)}</div>`}
+  const rows=(items,color,extra)=>items.slice().reverse().map(d=>`<div class="row"><span class="d" style="background:${color}"></span><span class="t">${esc(d.label)}${d.why?`<div class="sub">${esc(d.why)}</div>`:""}${extra&&extra(d)||""}${trust(d,true)}</span></div>`).join("");
+  h+=sec("tasks","Tasks",tasks.length,tasks.slice().reverse().map(x=>`<div class="row"><span class="chk ${x.done?"on":""}"></span><span class="t ${x.done?"done":""}">${esc(x.label)}${x.done?"":trust(x,true)}</span></div>`).join(""));
+  h+=sec("dec","Decisions",(s.decisions||[]).length,rows(s.decisions||[],"#3fb97f",d=>d.stale?'<div class="sub" style="color:var(--amber)">may be outdated</div>':""));
+  h+=sec("dead","Dead ends",(s.deadends||[]).length,rows(s.deadends||[],"#f06464"));
+  let tl="",last="";
+  (s.milestones||[]).forEach(mi=>{const d=day(mi.ts);if(d!==last){tl+=`<div class="day">${esc(d)}</div>`;last=d}
+    tl+=`<div class="row"><span class="d" style="background:${KIND[mi.kind]||"#888"}"></span><span class="t">${esc(mi.title.replace(/^(Started|Error|Fixed|Paused|Auto-paused|Failed attempt|Auto):?\s*/,"$1: ").slice(0,90))}<div class="sub">${esc(mi.kind)} - ${rel(mi.ts)}</div></span><button class="cp" data-c="rewind.handoffAt" data-a="${mi.id}" title="Copy a handoff from this milestone">Copy</button></div>`});
+  h+=sec("time","Timeline",(s.milestones||[]).length,tl);
+  h+=`<details data-k="add" ${open.add?"open":""}><summary><span class="l">Add manually</span></summary><div class="add"><button data-c="rewind.task">Task</button><button data-c="rewind.decide">Decision</button><button data-c="rewind.fail">Dead end</button><button data-c="rewind.ask">Ask</button></div></details>
+  <div class="foot">Captured automatically from your edits, terminal and editor problems.</div>`;
+  $("#app").innerHTML=h;
+  document.querySelectorAll("[data-c]").forEach(b=>b.onclick=e=>{e.stopPropagation();send(b.dataset.c,b.dataset.a?+b.dataset.a:undefined)});
+  document.querySelectorAll("details[data-k]").forEach(d=>d.ontoggle=()=>{open[d.dataset.k]=d.open;vs.setState({open})});
+}
+addEventListener("message",e=>{if(e.data&&"state" in e.data)render(e.data.state)});
+vs.postMessage({cmd:"ready"});
+</script></body></html>

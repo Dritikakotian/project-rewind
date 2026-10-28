@@ -1,0 +1,172 @@
+{
+  "name": "project-rewind",
+  "displayName": "Project Rewind",
+  "description": "Pause button and instant-rewind panel backed by the Rewind CLI.",
+  "version": "0.7.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rewind",
+          "title": "Rewind",
+          "icon": "$(history)"
+        }
+      ]
+    },
+    "views": {
+      "rewind": [
+        {
+          "type": "webview",
+          "id": "rewind.panel",
+          "name": "Instant Rewind"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "rewind.pause",
+        "title": "Rewind: Pause (save my mental state)",
+        "icon": "$(debug-pause)"
+      },
+      {
+        "command": "rewind.refresh",
+        "title": "Rewind: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "rewind.task",
+        "title": "Rewind: Set Current Task"
+      },
+      {
+        "command": "rewind.done",
+        "title": "Rewind: Complete Current Task"
+      },
+      {
+        "command": "rewind.checkpoint",
+        "title": "Rewind: Manual Checkpoint"
+      },
+      {
+        "command": "rewind.decide",
+        "title": "Rewind: Record Decision"
+      },
+      {
+        "command": "rewind.fail",
+        "title": "Rewind: Record Failed Attempt"
+      },
+      {
+        "command": "rewind.check",
+        "title": "Rewind: Was This Already Tried?"
+      },
+      {
+        "command": "rewind.ask",
+        "title": "Rewind: Ask"
+      },
+      {
+        "command": "rewind.handoff",
+        "title": "Rewind: Copy AI Handoff to Clipboard"
+      },
+      {
+        "command": "rewind.why",
+        "title": "Rewind: Why Is This File Like This?"
+      },
+      {
+        "command": "rewind.resume",
+        "title": "Rewind: Resume From Checkpoint"
+      },
+      {
+        "command": "rewind.simplify",
+        "title": "Rewind: Suggest Simplifications for Current File"
+      },
+      {
+        "command": "rewind.mcpConfig",
+        "title": "Rewind: Copy MCP Config for AI Tools"
+      },
+      {
+        "command": "rewind.graph",
+        "title": "Rewind: Open Context Graph"
+      },
+      {
+        "command": "rewind.openPanel",
+        "title": "Rewind: Open Panel"
+      },
+      {
+        "command": "rewind.handoffAt",
+        "title": "Rewind: Copy Handoff From Milestone"
+      },
+      {
+        "command": "rewind.dismissAway",
+        "title": "Rewind: Dismiss Away Summary"
+      },
+      {
+        "command": "rewind.showTried",
+        "title": "Rewind: Show What Was Already Tried"
+      },
+      {
+        "command": "rewind.confirm",
+        "title": "Rewind: Confirm Inferred Memory"
+      },
+      {
+        "command": "rewind.dismiss",
+        "title": "Rewind: Dismiss Inferred Memory"
+      }
+    ],
+    "viewsWelcome": [],
+    "menus": {
+      "view/title": [
+        {
+          "command": "rewind.pause",
+          "when": "view == rewind.panel",
+          "group": "navigation"
+        },
+        {
+          "command": "rewind.refresh",
+          "when": "view == rewind.panel",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Project Rewind",
+      "properties": {
+        "rewind.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Python executable."
+        },
+        "rewind.scriptPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to rewind.py. Empty = the copy bundled with this extension."
+        },
+        "rewind.captureOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run `rewind capture` (debounced) when files are saved."
+        },
+        "rewind.captureTerminal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Record terminal commands and errors (requires terminal shell integration)."
+        },
+        "rewind.autoPause": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save an inferred pause after 10 minutes away from the window and when the editor closes."
+        },
+        "rewind.captureProblems": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remember errors from the editor's Problems panel and mark them fixed when they clear."
+        }
+      }
+    }
+  }
+}
