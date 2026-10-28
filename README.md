@@ -13,9 +13,16 @@ git. Nothing leaves your machine.
 9. [Settings](#settings)  10. [Troubleshooting](#troubleshooting)  11. [Development](#development)  12. [Known limits](#known-limits)
 
 ## Quick start
-**VS Code:** install `vscode-extension/project-rewind-0.7.0.vsix` (Extensions panel, `...` menu, *Install from VSIX*), or
-run `python build.py --install`. Needs VS Code 1.93+, Python 3 and git on PATH. Open a folder and click the clock icon.
-Everything below is captured without typing anything.
+**Install from GitHub (no build tools needed):**
+1. Download [`dist/project-rewind-0.7.0.vsix`](https://github.com/Dritikakotian/project-rewind/raw/main/dist/project-rewind-0.7.0.vsix).
+2. Close all VS Code windows, then run `code --install-extension project-rewind-0.7.0.vsix --force`
+   (or Extensions panel, `...` menu, *Install from VSIX*).
+3. Open any project folder and click the clock icon in the left bar.
+
+Needs VS Code 1.93+, Python 3 and git on PATH. Everything below is captured without typing anything.
+
+**Build from source** (needs Node.js): `git clone https://github.com/Dritikakotian/project-rewind.git`, then
+`python build.py --install`. **Command line only:** `python rewind.py` inside any project folder.
 
 **Command line:** `python rewind.py` in a project shows where you stopped. Use `--project PATH` for another folder.
 
@@ -133,6 +140,9 @@ Layers (each imports only from those before it): `util` helpers, `storage` schem
 `project` git and file capture, `semantic` local similarity, `reasoning` links and trace, `memory` inferred memories,
 `handoff` relevance-ranked context, `graph` export and state, `simplify`, `commands`, `mcp_server`, `cli`.
 `python build.py --zip` also writes `../project-rewind.zip` for sharing.
+
+## License
+MIT, see [LICENSE](LICENSE). Contributions and issues are welcome.
 
 ## Known limits
 - Confidence scores are hand-set rules, not yet learned from your corrections.

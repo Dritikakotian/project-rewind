@@ -6,3 +6,4 @@ vscode-extension/rewind.py
 vscode-extension/rewind_core/
 # built packages belong on a GitHub Release, not in the repo
 *.vsix
+!dist/*.vsix

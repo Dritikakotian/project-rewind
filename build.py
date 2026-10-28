@@ -44,7 +44,14 @@ def package():
     npx = "npx.cmd" if os.name == "nt" else "npx"
     subprocess.run([npx, "--yes", "@vscode/vsce", "package", "--allow-missing-repository", "--skip-license"],
                    cwd=EXT, check=True)
-    return os.path.join(EXT, f"project-rewind-{__version__}.vsix")
+    vsix = os.path.join(EXT, f"project-rewind-{__version__}.vsix")
+    dist = os.path.join(ROOT, "dist")  # committed, so the repo itself offers a ready-to-install file
+    os.makedirs(dist, exist_ok=True)
+    for old in os.listdir(dist):
+        if old.endswith(".vsix"):
+            os.remove(os.path.join(dist, old))
+    shutil.copy(vsix, dist)
+    return vsix
 
 
 def make_zip(vsix):
