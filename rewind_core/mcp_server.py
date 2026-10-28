@@ -12,6 +12,7 @@ import time
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from . import __version__
 from .util import *  # noqa: F401,F403
 from .storage import *  # noqa: F401,F403
 from .project import *  # noqa: F401,F403
@@ -61,7 +62,7 @@ def cmd_mcp(p, a):
         res, err = {}, None
         if method == "initialize":
             res = {"protocolVersion": params.get("protocolVersion", "2024-11-05"), "capabilities": {"tools": {}},
-                   "serverInfo": {"name": "rewind", "version": "0.7.0"}, "instructions": AGENT_RULES}
+                   "serverInfo": {"name": "rewind", "version": __version__}, "instructions": AGENT_RULES}
         elif method == "tools/list":
             res = {"tools": [{"name": n, "description": d, "inputSchema": sch} for n, (d, sch, _) in tools.items()]}
         elif method == "tools/call":

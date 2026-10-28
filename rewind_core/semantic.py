@@ -38,7 +38,8 @@ def _stem(w):
 
 
 def _terms(text):
-    text = re.sub(r"(\d+)\s*(?:s|sec|secs|seconds)\b", r"\1", (text or "").lower())
+    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", text or "")  # TimeoutError -> Timeout Error
+    text = re.sub(r"(\d+)\s*(?:s|sec|secs|seconds)\b", r"\1", text.lower())
     words = [w for w in re.findall(r"[a-z0-9]+", text) if w not in _STOP]
     # synonyms are looked up before and after stemming: raising -> rais -> raise -> increase
     return [_CANON.get(w) or _CANON.get(_stem(w)) or _CANON.get(_stem(w) + "e") or _stem(w) for w in words]

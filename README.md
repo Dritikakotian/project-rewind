@@ -1,10 +1,13 @@
-# Project Rewind  (v0.7.0)
+# Project Rewind  (v0.7.1)
 
 The persistent memory and reasoning layer for developers and AI coding agents.
 
 Rewind records what you are doing, what failed, and why you decided things, so you (or an AI assistant) can pick up
 exactly where work stopped, without re-explaining the project. It is local-first: Python 3 standard library + SQLite +
 git. Nothing leaves your machine.
+
+**Watch the 1-minute demo:** [docs/project-rewind-demo.mp4](https://github.com/Dritikakotian/project-rewind/blob/main/docs/project-rewind-demo.mp4)
+(a real engine run rendered with the real panel and graph; it is not a screen recording of VS Code).
 
 ## Contents
 1. [Quick start](#quick-start)  2. [What you see in VS Code](#what-you-see-in-vs-code)  3. [Command line](#command-line)
@@ -14,8 +17,8 @@ git. Nothing leaves your machine.
 
 ## Quick start
 **Install from GitHub (no build tools needed):**
-1. Download [`dist/project-rewind-0.7.0.vsix`](https://github.com/Dritikakotian/project-rewind/raw/main/dist/project-rewind-0.7.0.vsix).
-2. Close all VS Code windows, then run `code --install-extension project-rewind-0.7.0.vsix --force`
+1. Download [`dist/project-rewind-0.7.1.vsix`](https://github.com/Dritikakotian/project-rewind/raw/main/dist/project-rewind-0.7.1.vsix).
+2. Close all VS Code windows, then run `code --install-extension project-rewind-0.7.1.vsix --force`
    (or Extensions panel, `...` menu, *Install from VSIX*).
 3. Open any project folder and click the clock icon in the left bar.
 
@@ -123,7 +126,7 @@ pairs, character trigrams and typo-tolerant fuzzy matching. Optional neural embe
 ## Troubleshooting
 - **Extension version missing or shows an old version.** VS Code keeps its own extension list in memory and can mark a
   CLI-installed version as removed when you reload. Close **all** VS Code windows, then run
-  `python build.py --install` (or `code --install-extension vscode-extension/project-rewind-0.7.0.vsix --force`) from a
+  `python build.py --install` (or `code --install-extension vscode-extension/project-rewind-0.7.1.vsix --force`) from a
   normal terminal, and reopen VS Code. Do not Uninstall first.
 - **Panel is empty or errors.** Check `python --version` works; if your command is `py` or `python3`, set `rewind.pythonPath`.
 - **Terminal commands are not captured.** Search settings for `terminal.integrated.shellIntegration.enabled` and enable it,
@@ -133,7 +136,8 @@ pairs, character trigrams and typo-tolerant fuzzy matching. Optional neural embe
 ## Development
 ```
 rewind.py            entry point                       build.py       builds/installs/zips the extension
-rewind_core/         the engine                        tests/         70 tests;  python run_tests.py [pattern]
+rewind_core/         the engine                        tests/         71 tests;  python run_tests.py [pattern]
+demo/make_demo.py    regenerates docs/project-rewind-demo.mp4 (needs Edge and ffmpeg)
 vscode-extension/    panel.html, extension.js          (rewind.py and rewind_core/ in it are generated; never edit them)
 ```
 Layers (each imports only from those before it): `util` helpers, `storage` schema / WAL / recovery / gc / encryption,

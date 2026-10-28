@@ -2,7 +2,7 @@
   "name": "project-rewind",
   "displayName": "Project Rewind",
   "description": "Persistent memory and reasoning layer for developers and AI coding agents.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "publisher": "local",
   "engines": {
     "vscode": "^1.93.0"

@@ -17,6 +17,11 @@ class SemanticTests(unittest.TestCase):
         self.assertAlmostEqual(similarity("fix login", "fix login"), 1.0, places=5)
         self.assertEqual(similarity("", "fix login"), 0.0)
 
+    def test_identifiers_are_split_into_words(self):
+        # CamelCase and snake_case names carry their meaning in their parts
+        self.assertGreater(similarity("the timeout did not help", "TimeoutError: gateway failed"), 0.2)
+        self.assertGreater(similarity("api client", "api_client.py"), 0.5)
+
     def test_typos_still_match(self):
         self.assertGreater(similarity("database migration failed", "databse migraton faild"), 0.3)
 
