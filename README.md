@@ -154,4 +154,5 @@ MIT, see [LICENSE](LICENSE). Contributions and issues are welcome.
 - Matching is lexical and synonym-based by default, so very different wording of the same idea can be missed.
 - Terminal capture needs VS Code shell integration; the simplifier is deepest for Python.
 - Optional encryption and neural embeddings are untested on machines without those libraries installed.
+- [![M8ven Score](https://m8ven.ai/badge/mcp/dritikakotian/project-rewind)](https://m8ven.ai/mcp/dritikakotian/project-rewind?s=readme)
 [![M8ven Score](https://m8ven.ai/badge/mcp/dritikakotian-project-rewind-1s3fu5)](https://m8ven.ai/mcp/dritikakotian-project-rewind-1s3fu5?s=readme)
